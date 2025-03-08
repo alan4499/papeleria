@@ -4,14 +4,14 @@ import java.sql.*;
 import java.util.HashMap;
 import java.util.Map;
 
-public class BuenPanApp extends JFrame {
+public class PapeleriaApp extends JFrame {
     private JButton btnAgregarInventario, btnAgregarProducto, btnActualizar, btnPagar, btnBorrarProducto;
     private JPanel panelProductos;
     private JLabel lblTotal;
     private Map<Integer, Integer> carrito = new HashMap<>();
     private double total = 0.0;
 
-    public BuenPanApp() {
+    public PapeleriaApp() {
         setTitle("Buen Pan - Sistema de Panadería");
         setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
@@ -203,6 +203,6 @@ public class BuenPanApp extends JFrame {
     }
 
     public static void main(String[] args) {
-        SwingUtilities.invokeLater(() -> new BuenPanApp().setVisible(true));
+        SwingUtilities.invokeLater(() -> new PapeleriaApp().setVisible(true));
     }
 }
