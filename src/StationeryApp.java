@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StationeryApp extends JFrame {
-    private JButton btnAgregarInventario, btnAgregarProducto, btnActualizar, btnPagar, btnBorrarProducto, btnCancelarCompra, btnBuscar;
+    private JButton btnAgregarInventario, btnAgregarProducto, btnActualizar, btnPagar, btnBorrarProducto, btnCancelarCompra, btnBuscar, btnActualizarPrecio;
     private JPanel panelProductos;
     private JLabel lblTotal;
     private JTextField txtBuscar;
@@ -20,6 +20,7 @@ public class StationeryApp extends JFrame {
 
         // Panel de botones superiores
         JPanel panelBotones = new JPanel();
+        btnActualizarPrecio = new JButton("Actualizar Precio");
         btnAgregarInventario = new JButton("Agregar Inventario");
         btnAgregarProducto = new JButton("Agregar Producto");
         btnActualizar = new JButton("Actualizar");
@@ -27,6 +28,7 @@ public class StationeryApp extends JFrame {
         txtBuscar = new JTextField(15);
         btnBuscar = new JButton("Buscar");
 
+        panelBotones.add(btnActualizarPrecio);
         panelBotones.add(btnAgregarInventario);
         panelBotones.add(btnAgregarProducto);
         panelBotones.add(btnActualizar);
@@ -48,7 +50,6 @@ public class StationeryApp extends JFrame {
         btnPagar = new JButton("Pagar");
         btnCancelarCompra = new JButton("Cancelar Compra");
 
-        // Hacer el botón "Pagar" más grande
         btnPagar.setPreferredSize(new Dimension(150, 50));
         btnCancelarCompra.setPreferredSize(new Dimension(150, 50));
 
@@ -58,6 +59,7 @@ public class StationeryApp extends JFrame {
         add(panelInferior, BorderLayout.SOUTH);
 
         // Acciones de los botones
+        btnActualizarPrecio.addActionListener(e -> actualizarPrecio());
         btnAgregarInventario.addActionListener(e -> agregarInventario());
         btnAgregarProducto.addActionListener(e -> agregarProducto());
         btnActualizar.addActionListener(e -> actualizarProductos());
@@ -68,6 +70,34 @@ public class StationeryApp extends JFrame {
 
         // Cargar productos iniciales
         actualizarProductos();
+    }
+
+    private void actualizarPrecio() {
+        String idProducto = JOptionPane.showInputDialog(this, "Ingrese el ID del producto:");
+        String precio = JOptionPane.showInputDialog(this, "Ingrese el nuevo precio del producto:");
+
+        if (idProducto != null && precio != null) {
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "usuario2", "1")) {
+                int id = Integer.parseInt(idProducto);
+                double precioProducto = Double.parseDouble(precio);
+
+                // Actualizar el precio del producto
+                String sql = "UPDATE productos SET precio = ? WHERE id = ?";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setDouble(1, precioProducto);
+                pstmt.setInt(2, id);
+                int rowsAffected = pstmt.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(this, "Precio actualizado correctamente.");
+                    actualizarProductos(); // Refrescar la lista
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se encontró el producto con ID: " + id);
+                }
+            } catch (SQLException | NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            }
+        }
     }
 
     private void agregarInventario() {
@@ -140,7 +170,7 @@ public class StationeryApp extends JFrame {
                 int stock = rs.getInt("stock");
 
                 // Crear un botón para cada producto
-                JButton btnProducto = new JButton("<html>" + nombre + "<br>Precio: $" + precio + "<br>Stock: " + stock + "</html>");
+                JButton btnProducto = new JButton("<html>" + "id: " + id + "<br>" + nombre + "<br>Precio: $" + precio + "<br>Stock: " + stock + "</html>");
                 btnProducto.addActionListener(e -> agregarAlCarrito(id, precio));
                 panelProductos.add(btnProducto);
             }
