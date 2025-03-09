@@ -14,9 +14,13 @@ public class StationeryApp extends JFrame {
 
     public StationeryApp() {
         setTitle("StationeryApp - Sistema de Papelería");
-        setSize(600, 400);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setLayout(new BorderLayout());
+
+        // Obtener el tamaño de la pantalla
+        Dimension screenSize = Toolkit.getDefaultToolkit().getScreenSize();
+        setSize(screenSize.width, screenSize.height);
+        setExtendedState(JFrame.MAXIMIZED_BOTH);
 
         // Panel de botones superiores
         JPanel panelBotones = new JPanel();
@@ -73,9 +77,9 @@ public class StationeryApp extends JFrame {
 
         // Cargar productos iniciales
         actualizarProductos();
-        }
+    }
 
-        private void reabastecer() {
+    private void reabastecer() {
         try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "usuario2", "1")) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM productos WHERE stock <= 1");
@@ -99,9 +103,9 @@ public class StationeryApp extends JFrame {
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al mostrar productos con bajo stock: " + e.getMessage());
         }
-        }
+    }
 
-        private void actualizarPrecio() {
+    private void actualizarPrecio() {
         String idProducto = JOptionPane.showInputDialog(this, "Ingrese el ID del producto:");
         String precio = JOptionPane.showInputDialog(this, "Ingrese el nuevo precio del producto:");
 
