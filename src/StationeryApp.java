@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StationeryApp extends JFrame {
-    private JButton btnAgregarInventario, btnAgregarProducto, btnActualizar, btnPagar, btnBorrarProducto, btnCancelarCompra, btnBuscar, btnActualizarPrecio;
+    private JButton btnActualizarPrecio, btnreabastecer, btnActualizar, btnAgregarInventario, btnAgregarProducto, btnPagar, btnBorrarProducto, btnCancelarCompra, btnBuscar;
     private JPanel panelProductos;
     private JLabel lblTotal;
     private JTextField txtBuscar;
@@ -20,6 +20,7 @@ public class StationeryApp extends JFrame {
 
         // Panel de botones superiores
         JPanel panelBotones = new JPanel();
+        btnreabastecer = new JButton("Reabastecer");
         btnActualizarPrecio = new JButton("Actualizar Precio");
         btnAgregarInventario = new JButton("Agregar Inventario");
         btnAgregarProducto = new JButton("Agregar Producto");
@@ -28,10 +29,11 @@ public class StationeryApp extends JFrame {
         txtBuscar = new JTextField(15);
         btnBuscar = new JButton("Buscar");
 
+        panelBotones.add(btnreabastecer);
+        panelBotones.add(btnActualizar);
         panelBotones.add(btnActualizarPrecio);
         panelBotones.add(btnAgregarInventario);
         panelBotones.add(btnAgregarProducto);
-        panelBotones.add(btnActualizar);
         panelBotones.add(btnBorrarProducto);
         panelBotones.add(new JLabel("Buscar:"));
         panelBotones.add(txtBuscar);
@@ -59,10 +61,11 @@ public class StationeryApp extends JFrame {
         add(panelInferior, BorderLayout.SOUTH);
 
         // Acciones de los botones
+        btnreabastecer.addActionListener(e -> reabastecer());
+        btnActualizar.addActionListener(e -> actualizarProductos());
         btnActualizarPrecio.addActionListener(e -> actualizarPrecio());
         btnAgregarInventario.addActionListener(e -> agregarInventario());
         btnAgregarProducto.addActionListener(e -> agregarProducto());
-        btnActualizar.addActionListener(e -> actualizarProductos());
         btnPagar.addActionListener(e -> pagar());
         btnBorrarProducto.addActionListener(e -> borrarProducto());
         btnCancelarCompra.addActionListener(e -> cancelarCompra());
@@ -70,9 +73,35 @@ public class StationeryApp extends JFrame {
 
         // Cargar productos iniciales
         actualizarProductos();
-    }
+        }
 
-    private void actualizarPrecio() {
+        private void reabastecer() {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "usuario2", "1")) {
+            Statement stmt = conn.createStatement();
+            ResultSet rs = stmt.executeQuery("SELECT * FROM productos WHERE stock <= 1");
+
+            panelProductos.removeAll(); // Limpiar el panel de productos
+            while (rs.next()) {
+            int id = rs.getInt("id");
+            String nombre = rs.getString("nombre");
+            double precio = rs.getDouble("precio");
+            int stock = rs.getInt("stock");
+
+            // Crear un botón para cada producto con bajo stock
+            JButton btnProducto = new JButton("<html>" + "id: " + id + "<br>" + nombre + "<br>Precio: $" + precio + "<br>Stock: " + stock + "</html>");
+            btnProducto.addActionListener(e -> agregarAlCarrito(id, precio));
+            panelProductos.add(btnProducto);
+            }
+
+            JOptionPane.showMessageDialog(this, "Productos con bajo stock mostrados.");
+            panelProductos.revalidate(); // Refrescar el panel
+            panelProductos.repaint();
+        } catch (SQLException e) {
+            JOptionPane.showMessageDialog(this, "Error al mostrar productos con bajo stock: " + e.getMessage());
+        }
+        }
+
+        private void actualizarPrecio() {
         String idProducto = JOptionPane.showInputDialog(this, "Ingrese el ID del producto:");
         String precio = JOptionPane.showInputDialog(this, "Ingrese el nuevo precio del producto:");
 
