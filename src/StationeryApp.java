@@ -80,7 +80,7 @@ public class StationeryApp extends JFrame {
     }
 
     private void reabastecer() {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "usuario2", "1")) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "root", "")) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM productos WHERE stock <= 1");
 
@@ -110,7 +110,7 @@ public class StationeryApp extends JFrame {
         String precio = JOptionPane.showInputDialog(this, "Ingrese el nuevo precio del producto:");
 
         if (idProducto != null && precio != null) {
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "usuario2", "1")) {
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "root", "")) {
                 int id = Integer.parseInt(idProducto);
                 double precioProducto = Double.parseDouble(precio);
 
@@ -138,7 +138,7 @@ public class StationeryApp extends JFrame {
         String cantidad = JOptionPane.showInputDialog(this, "Ingrese la cantidad a agregar:");
 
         if (idProducto != null && cantidad != null) {
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "usuario2", "1")) {
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "root", "")) {
                 int id = Integer.parseInt(idProducto);
                 int cant = Integer.parseInt(cantidad);
 
@@ -168,7 +168,7 @@ public class StationeryApp extends JFrame {
         String precio = JOptionPane.showInputDialog(this, "Ingrese el precio del producto:");
 
         if (nombre != null && idProducto != null && cantidad != null && precio != null) {
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "usuario2", "1")) {
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "root", "")) {
                 int id = Integer.parseInt(idProducto);
                 int cant = Integer.parseInt(cantidad);
                 double precioProducto = Double.parseDouble(precio);
@@ -192,7 +192,7 @@ public class StationeryApp extends JFrame {
 
     private void actualizarProductos() {
         panelProductos.removeAll(); // Limpiar el panel de productos
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "usuario2", "1")) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "root", "")) {
             Statement stmt = conn.createStatement();
             ResultSet rs = stmt.executeQuery("SELECT * FROM productos");
 
@@ -229,7 +229,7 @@ public class StationeryApp extends JFrame {
     }
 
     private void pagar() {
-        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "usuario2", "1")) {
+        try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "root", "")) {
             for (Map.Entry<Integer, Integer> entry : carrito.entrySet()) {
                 int id = entry.getKey();
                 int cantidad = entry.getValue();
@@ -282,7 +282,7 @@ public class StationeryApp extends JFrame {
     private void borrarProducto() {
         String idProducto = JOptionPane.showInputDialog(this, "Ingrese el ID del producto a borrar:");
         if (idProducto != null) {
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "usuario2", "1")) {
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "root", "")) {
                 int id = Integer.parseInt(idProducto);
 
                 // Eliminar el producto
@@ -307,7 +307,7 @@ public class StationeryApp extends JFrame {
         String nombreBuscar = txtBuscar.getText().trim();
         if (!nombreBuscar.isEmpty()) {
             panelProductos.removeAll(); // Limpiar el panel de productos
-            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "usuario2", "1")) {
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "root", "")) {
                 String sql = "SELECT * FROM productos WHERE nombre LIKE ?";
                 PreparedStatement pstmt = conn.prepareStatement(sql);
                 pstmt.setString(1, "%" + nombreBuscar + "%");
