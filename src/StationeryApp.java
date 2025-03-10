@@ -46,7 +46,7 @@ public class StationeryApp extends JFrame {
 
         // Panel de productos (botones dinámicos)
         panelProductos = new JPanel();
-        panelProductos.setLayout(new GridLayout(0, 2, 10, 10)); // 2 columnas, espacio entre botones
+        panelProductos.setLayout(new GridLayout(0, 4, 10, 10)); // 4 columnas, espacio entre botones
         JScrollPane scrollPane = new JScrollPane(panelProductos);
         add(scrollPane, BorderLayout.CENTER);
 
