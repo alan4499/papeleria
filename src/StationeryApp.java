@@ -5,7 +5,7 @@ import java.util.HashMap;
 import java.util.Map;
 
 public class StationeryApp extends JFrame {
-    private JButton btnActualizarPrecio, btnreabastecer, btnActualizar, btnAgregarInventario, btnAgregarProducto, btnPagar, btnBorrarProducto, btnCancelarCompra, btnBuscar;
+    private JButton btnActualizarPrecio, btnReabastecer, btnActualizar, btnAgregarInventario, btnAgregarProducto, btnPagar, btnBorrarProducto, btnCancelarCompra, btnBuscar;
     private JPanel panelProductos;
     private JLabel lblTotal;
     private JTextField txtBuscar;
@@ -24,7 +24,7 @@ public class StationeryApp extends JFrame {
 
         // Panel de botones superiores
         JPanel panelBotones = new JPanel();
-        btnreabastecer = new JButton("Reabastecer");
+        btnReabastecer = new JButton("Reabastecer");
         btnActualizarPrecio = new JButton("Actualizar Precio");
         btnAgregarInventario = new JButton("Agregar Inventario");
         btnAgregarProducto = new JButton("Agregar Producto");
@@ -33,7 +33,7 @@ public class StationeryApp extends JFrame {
         txtBuscar = new JTextField(15);
         btnBuscar = new JButton("Buscar");
 
-        panelBotones.add(btnreabastecer);
+        panelBotones.add(btnReabastecer);
         panelBotones.add(btnActualizar);
         panelBotones.add(btnActualizarPrecio);
         panelBotones.add(btnAgregarInventario);
@@ -65,7 +65,7 @@ public class StationeryApp extends JFrame {
         add(panelInferior, BorderLayout.SOUTH);
 
         // Acciones de los botones
-        btnreabastecer.addActionListener(e -> reabastecer());
+        btnReabastecer.addActionListener(e -> reabastecer());
         btnActualizar.addActionListener(e -> actualizarProductos());
         btnActualizarPrecio.addActionListener(e -> actualizarPrecio());
         btnAgregarInventario.addActionListener(e -> agregarInventario());
@@ -86,22 +86,46 @@ public class StationeryApp extends JFrame {
 
             panelProductos.removeAll(); // Limpiar el panel de productos
             while (rs.next()) {
-            int id = rs.getInt("id");
-            String nombre = rs.getString("nombre");
-            double precio = rs.getDouble("precio");
-            int stock = rs.getInt("stock");
+                int id = rs.getInt("id");
+                String nombre = rs.getString("nombre");
+                double precio = rs.getDouble("precio");
+                int stock = rs.getInt("stock");
 
-            // Crear un botón para cada producto con bajo stock
-            JButton btnProducto = new JButton("<html>" + "id: " + id + "<br>" + nombre + "<br>Precio: $" + precio + "<br>Stock: " + stock + "</html>");
-            btnProducto.addActionListener(e -> agregarAlCarrito(id, precio));
-            panelProductos.add(btnProducto);
+                // Crear un botón para cada producto con bajo stock
+                JButton btnProducto = new JButton("<html>" + "id: " + id + "<br>" + nombre + "<br>Precio: $" + precio + "<br>Stock: " + stock + "</html>");
+                btnProducto.addActionListener(e -> reabastecerProducto(id)); // Llamar a la función de reabastecer
+                panelProductos.add(btnProducto);
             }
 
-            JOptionPane.showMessageDialog(this, "Productos con bajo stock mostrados.");
             panelProductos.revalidate(); // Refrescar el panel
             panelProductos.repaint();
         } catch (SQLException e) {
             JOptionPane.showMessageDialog(this, "Error al mostrar productos con bajo stock: " + e.getMessage());
+        }
+    }
+
+    private void reabastecerProducto(int idProducto) {
+        String cantidadStr = JOptionPane.showInputDialog(this, "Ingrese la cantidad a reabastecer:");
+        if (cantidadStr != null && !cantidadStr.isEmpty()) {
+            try (Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3306/StationeryApp", "root", "")) {
+                int cantidad = Integer.parseInt(cantidadStr);
+
+                // Actualizar el stock del producto
+                String sql = "UPDATE productos SET stock = stock + ? WHERE id = ?";
+                PreparedStatement pstmt = conn.prepareStatement(sql);
+                pstmt.setInt(1, cantidad);
+                pstmt.setInt(2, idProducto);
+                int rowsAffected = pstmt.executeUpdate();
+
+                if (rowsAffected > 0) {
+                    JOptionPane.showMessageDialog(this, "Stock actualizado correctamente.");
+                    actualizarProductos(); // Refrescar la lista de productos
+                } else {
+                    JOptionPane.showMessageDialog(this, "No se encontró el producto con ID: " + idProducto);
+                }
+            } catch (SQLException | NumberFormatException e) {
+                JOptionPane.showMessageDialog(this, "Error: " + e.getMessage());
+            }
         }
     }
 
